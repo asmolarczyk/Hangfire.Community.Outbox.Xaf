@@ -33,6 +33,7 @@ For a great explanation of what the outbox pattern is and what it tries to solve
 4. .net 8 project with EntityFramework Core 8
 
 ## 3. Installation
+WARNING: PENDING AUTHORIZATION FROM HANGFIRE'S OWNERS TO PUBLISH UNDER THE RESERVED Hangfire PREFIX
 ```
 dotnet add package Hangfire.EfCore.Outbox
 ```
