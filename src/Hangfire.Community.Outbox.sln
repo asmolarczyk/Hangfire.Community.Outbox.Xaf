@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Outbox", "Hangfire.Outbox\Hangfire.Outbox.csproj", "{BADFAE74-E280-424D-B2C9-9736AC9D82DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Community.Outbox", "Hangfire.Community.Outbox\Hangfire.Community.Outbox.csproj", "{BADFAE74-E280-424D-B2C9-9736AC9D82DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CC1FF8E4-9E70-4768-8E49-06B8F76106F5}
 	EndGlobalSection
 EndGlobal

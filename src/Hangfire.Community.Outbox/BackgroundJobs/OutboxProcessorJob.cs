@@ -1,6 +1,6 @@
-﻿using Hangfire.Outbox.Services;
+﻿using Hangfire.Community.Outbox.Services;
 
-namespace Hangfire.Outbox.BackgroundJobs;
+namespace Hangfire.Community.Outbox.BackgroundJobs;
 
 public class OutboxProcessorJob
 {

@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Hangfire.Outbox.Entities;
+using Hangfire.Community.Outbox.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Hangfire.Outbox.Extensions;
+namespace Hangfire.Community.Outbox.Extensions;
 
 public static class IBackgroundJobClientExtensions
 {

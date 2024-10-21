@@ -3,11 +3,11 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Hangfire.Common;
-using Hangfire.Outbox.Extensions;
+using Hangfire.Community.Outbox.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Hangfire.Outbox.Entities;
+namespace Hangfire.Community.Outbox.Entities;
 
 [EntityTypeConfiguration(typeof(OutboxJobEntityTypeConfiguration))]
 public class OutboxJob

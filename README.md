@@ -1,4 +1,4 @@
-# Hangfire.Outbox
+# Hangfire.Community.Outbox
 Outbox pattern implementation for Hangfire using EntityFramework Core
 
 1. [Motivation](#1-motivation)

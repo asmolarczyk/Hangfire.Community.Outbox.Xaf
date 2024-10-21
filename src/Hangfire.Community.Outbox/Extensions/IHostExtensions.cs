@@ -1,8 +1,8 @@
-﻿using Hangfire.Outbox.BackgroundJobs;
+﻿using Hangfire.Community.Outbox.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Hangfire.Outbox.Extensions;
+namespace Hangfire.Community.Outbox.Extensions;
 
 public static class IHostExtensions
 {

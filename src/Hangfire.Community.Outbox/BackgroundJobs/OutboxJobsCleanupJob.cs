@@ -1,11 +1,11 @@
-﻿using Hangfire.Outbox.Entities;
-using Hangfire.Outbox.Extensions;
-using Hangfire.Outbox.Services;
+﻿using Hangfire.Community.Outbox.Entities;
+using Hangfire.Community.Outbox.Extensions;
+using Hangfire.Community.Outbox.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Hangfire.Outbox.BackgroundJobs;
+namespace Hangfire.Community.Outbox.BackgroundJobs;
 
 public class OutboxJobsCleanupJob
 {

@@ -1,12 +1,12 @@
 ﻿using Hangfire.Common;
-using Hangfire.Outbox.Entities;
-using Hangfire.Outbox.Extensions;
+using Hangfire.Community.Outbox.Entities;
+using Hangfire.Community.Outbox.Extensions;
 using Hangfire.States;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Hangfire.Outbox.Services;
+namespace Hangfire.Community.Outbox.Services;
 
 public class OutboxProcessor: IOutboxProcessor
 {

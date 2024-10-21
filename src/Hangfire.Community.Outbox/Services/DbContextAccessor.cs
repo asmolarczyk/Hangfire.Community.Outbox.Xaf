@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Hangfire.Outbox.Services;
+namespace Hangfire.Community.Outbox.Services;
 
 public class DbContextAccessor: IDbContextAccessor
 {

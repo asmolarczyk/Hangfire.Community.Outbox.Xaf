@@ -1,9 +1,9 @@
-﻿using Hangfire.Outbox.HostedServices;
-using Hangfire.Outbox.Services;
+﻿using Hangfire.Community.Outbox.HostedServices;
+using Hangfire.Community.Outbox.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Hangfire.Outbox.Extensions;
+namespace Hangfire.Community.Outbox.Extensions;
 
 public static class IServiceCollectionExtensions
 {
