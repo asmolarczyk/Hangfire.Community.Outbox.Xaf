@@ -1,23 +1,24 @@
 ﻿namespace Hangfire.Community.Outbox.Xaf.Entities;
 
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using DevExpress.Xpo;
 using Extensions;
 using Hangfire.Common;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-[EntityTypeConfiguration(typeof(OutboxJobEntityTypeConfiguration))]
-public class OutboxJob
+[Persistent]
+public class OutboxJob : INotifyPropertyChanged
 {
     private OutboxJob()
     { }
 
     private static OutboxJob Build(Job job, string queue)
     {
-        return new OutboxJob()
+        return new OutboxJob
         {
             JobType = job.Type.GetFriendlyName(),
             ArgumentTypesJson =
@@ -31,7 +32,7 @@ public class OutboxJob
     
     private static OutboxJob Build(Job job, DateTimeOffset enqueueAt, string queue)
     {
-        return new OutboxJob()
+        return new OutboxJob
         {
             JobType = job.Type.GetFriendlyName(),
             ArgumentTypesJson =
@@ -46,7 +47,7 @@ public class OutboxJob
     
     private static OutboxJob Build(Job job, TimeSpan delay, string queue)
     {
-        return new OutboxJob()
+        return new OutboxJob
         {
             JobType = job.Type.GetFriendlyName(),
             ArgumentTypesJson =
@@ -118,17 +119,36 @@ public class OutboxJob
     {
         return Build(Job.FromExpression(expression, queue), delay, queue);
     }
-    
-    public long Id { get; set; }
-    public string JobType { get; set; }
-    public string MethodName { get; set; }
-    private string ArgumentTypesJson { get; set; }
-    private string ArgumentValuesJson { get; set; }
-    public string? Queue { get; set; }
-    public string? HangfireJobId { get; set; }
-    
-    public DateTimeOffset? EnqueueAt { get; set; }
-    public TimeSpan? Delay { get; set; }
+
+    [Key(AutoGenerate = false)]
+    public Guid Oid { get; init; } = Guid.NewGuid();
+
+    public string JobType { get; init; }
+
+    public string MethodName { get; init; }
+
+    [Size(1000)]
+    [Persistent]
+    private string ArgumentTypesJson { get; init; }
+
+    [Size(SizeAttribute.Unlimited)]
+    [Persistent]
+    private string ArgumentValuesJson { get; init; }
+
+    public string? Queue { get; init; }
+
+    private string? hangfireJobId;
+
+    public string? HangfireJobId
+    {
+        get => hangfireJobId;
+        set => SetField(ref hangfireJobId, value);
+    }
+
+    public DateTimeOffset? EnqueueAt { get; init; }
+
+    public TimeSpan? Delay { get; init; }
+
     
     public IEnumerable<object> GetArguments()
     {
@@ -171,28 +191,57 @@ public class OutboxJob
         return jobType;
     }
     
-    public DateTime CreatedOn { get; set; }
-    public bool Processed { get; set; }
-    public string? Exception { get; set; }
-    
-    
-    public class OutboxJobEntityTypeConfiguration : IEntityTypeConfiguration<OutboxJob>
+    public DateTimeOffset CreatedOn { get; init; }
+
+    private bool processed;
+
+    public bool Processed
     {
-        public void Configure(EntityTypeBuilder<OutboxJob> builder)
-        {
-            builder.ToTable(HangfireOutboxStaticOptions.Options.OutboxJobTableName, HangfireOutboxStaticOptions.Options.OutboxJobSchema);
+        get => processed;
+        set => SetField(ref processed, value);
+    }
 
-            builder.Property(x => x.JobType).IsRequired();
-            builder.Property(x => x.Exception).IsRequired(false);
-            builder.Property(x => x.ArgumentTypesJson).IsRequired();
-            builder.Property(x => x.ArgumentValuesJson).IsRequired();
-            builder.Property(x => x.Queue).IsRequired(false);
-            builder.Property(x => x.MethodName).IsRequired();
-            builder.Property(x => x.EnqueueAt).IsRequired(false);
-            builder.Property(x => x.Delay).IsRequired(false);
+    private string? exception;
+    
+    [Size(SizeAttribute.Unlimited)]
+    public string? Exception
+    {
+        get => exception;
+        set => SetField(ref exception, value);
+    }
 
-            builder.HasIndex(x => x.Processed).HasDatabaseName("IDX_Processed");
-            builder.HasIndex(x => x.CreatedOn).HasDatabaseName("IDX_CreatedOn");
-        }
+
+    //public class OutboxJobEntityTypeConfiguration : IEntityTypeConfiguration<OutboxJob>
+    //{
+    //    public void Configure(EntityTypeBuilder<OutboxJob> builder)
+    //    {
+    //        builder.ToTable(HangfireOutboxStaticOptions.Options.OutboxJobTableName, HangfireOutboxStaticOptions.Options.OutboxJobSchema);
+    //
+    //        builder.Property(x => x.JobType).IsRequired();
+    //        builder.Property(x => x.Exception).IsRequired(false);
+    //        builder.Property(x => x.ArgumentTypesJson).IsRequired();
+    //        builder.Property(x => x.ArgumentValuesJson).IsRequired();
+    //        builder.Property(x => x.Queue).IsRequired(false);
+    //        builder.Property(x => x.MethodName).IsRequired();
+    //        builder.Property(x => x.EnqueueAt).IsRequired(false);
+    //        builder.Property(x => x.Delay).IsRequired(false);
+    //
+    //        builder.HasIndex(x => x.Processed).HasDatabaseName("IDX_Processed");
+    //        builder.HasIndex(x => x.CreatedOn).HasDatabaseName("IDX_CreatedOn");
+    //    }
+    //}
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
     }
 }

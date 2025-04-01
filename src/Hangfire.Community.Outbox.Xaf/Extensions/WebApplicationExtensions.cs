@@ -1,25 +1,23 @@
 ﻿namespace Hangfire.Community.Outbox.Xaf.Extensions;
 
+using DevExpress.ExpressApp;
+using DevExpress.Xpo;
 using Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Services;
 
 public static class WebApplicationExtensions
 {
     public static void UseHangfireOutboxDashboard(this WebApplication app, string path = "/hangfireoutbox")
     {
-
-        app.MapGet(path, async (HttpContext context, [FromServices] IDbContextAccessor dbContextAccessor) =>
+        app.MapGet(path, async (HttpContext context, [FromServices] INonSecuredObjectSpaceFactory osFactory) =>
         {
-            var latest = await dbContextAccessor.GetDbContext()
-                .Set<OutboxJob>()
-                .AsNoTracking()
+            using var os = osFactory.CreateNonSecuredObjectSpace(typeof(OutboxJob));
+            var latest = await os.GetObjectsQuery<OutboxJob>()
                 .Take(1000)
                 .OrderByDescending(x => x.CreatedOn)
-                .Select(x => new { x.Id, x.HangfireJobId, x.JobType, x.MethodName, x.Queue, x.Exception, Status = x.HangfireJobId == null && x.Exception == null ? OutboxJobStatus.Pending : x.HangfireJobId != null ? OutboxJobStatus.Processed : OutboxJobStatus.Error })
+                .Select(x => new { Id = x.Oid, x.HangfireJobId, x.JobType, x.MethodName, x.Queue, x.Exception, Status = x.HangfireJobId == null && x.Exception == null ? OutboxJobStatus.Pending : x.HangfireJobId != null ? OutboxJobStatus.Processed : OutboxJobStatus.Error })
                 .ToArrayAsync();
 
             return Results.Ok(latest);

@@ -1,21 +1,22 @@
 ﻿namespace Hangfire.Community.Outbox.Xaf.BackgroundJobs;
 
-using Entities;
-using Extensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using DevExpress.ExpressApp;
+using DevExpress.Xpo;
+using Hangfire.Community.Outbox.Xaf.Entities;
+using Hangfire.Community.Outbox.Xaf.Extensions;
 using Microsoft.Extensions.Logging;
-using Services;
 
 public class OutboxJobsCleanupJob
 {
-    private readonly IServiceScopeFactory _serviceScopeFactory;
+    protected INonSecuredObjectSpaceFactory ObjectSpaceFactory { get; }
+
     private readonly ILogger<OutboxJobsCleanupJob> _logger;
+
     private readonly HangfireOutboxOptions _outboxOptions;
 
-    public OutboxJobsCleanupJob(IServiceScopeFactory serviceScopeFactory, ILogger<OutboxJobsCleanupJob> logger, HangfireOutboxOptions outboxOptions)
+    public OutboxJobsCleanupJob(INonSecuredObjectSpaceFactory objectSpaceFactory, ILogger<OutboxJobsCleanupJob> logger, HangfireOutboxOptions outboxOptions)
     {
-        _serviceScopeFactory = serviceScopeFactory;
+        ObjectSpaceFactory = objectSpaceFactory;
         _logger = logger;
         _outboxOptions = outboxOptions;
     }
@@ -23,30 +24,25 @@ public class OutboxJobsCleanupJob
     public async Task CleanOldJobs(CancellationToken ct)
     {
         _logger.LogDebug("Cleaning old outbox jobs");
-        
-        using var scope = _serviceScopeFactory.CreateScope();
-        var dbContextAccessor = scope.ServiceProvider.GetRequiredService<IDbContextAccessor>();
-        await using var dbContext = dbContextAccessor.GetDbContext();
 
-        var threshold = DateTime.UtcNow.Subtract(_outboxOptions.CleanupOlderThan);
-        
-        var query = dbContext.Set<OutboxJob>().Where(x => x.Processed && x.CreatedOn <= threshold);
+        var threshold = DateTimeOffset.UtcNow.Subtract(_outboxOptions.CleanupOlderThan);
+
+        var os = ObjectSpaceFactory.CreateNonSecuredObjectSpace<OutboxJob>();
+        var query = os.GetObjectsQuery<OutboxJob>().Where(x => x.Processed && x.CreatedOn <= threshold);
 
         if (!_outboxOptions.CleanupJobsWithExceptions)
         {
             query = query.Where(x => x.Exception == null);
         }
 
-#if NET8_0
-        var deletedCount = await query.ExecuteDeleteAsync(ct);
-#else
         var toDelete = await query.ToArrayAsync(ct);
-        var deletedCount = toDelete.Length;
-        
-        dbContext.Set<OutboxJob>().RemoveRange(toDelete);
+        if (toDelete.Length > 0)
+        {
+            os.Delete(toDelete);
+            os.CommitChanges();
 
-        await dbContext.SaveChangesAsync(ct);
-#endif
-        _logger.LogDebug("Deleted {deletedCount} outbox jobs older than {threshold}", deletedCount, threshold);
+            var deletedCount = toDelete.Length;
+            _logger.LogDebug("Deleted {deletedCount} outbox jobs older than {threshold}", deletedCount, threshold);
+        }
     }
 }

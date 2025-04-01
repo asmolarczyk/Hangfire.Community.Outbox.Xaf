@@ -1,10 +1,12 @@
 ﻿namespace Hangfire.Community.Outbox.Xaf.Services;
 
+using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.DC;
+using DevExpress.Xpo;
 using Entities;
 using Extensions;
 using Hangfire.Common;
 using Hangfire.States;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -24,12 +26,10 @@ public class OutboxProcessor: IOutboxProcessor
     public async Task Process(CancellationToken ct)
     {
         using var scope = _serviceScopeFactory.CreateScope();
-        var dbContextAccessor = scope.ServiceProvider.GetRequiredService<IDbContextAccessor>();
-        await using var dbContext = dbContextAccessor.GetDbContext();
+        var osFactory = scope.ServiceProvider.GetRequiredService<INonSecuredObjectSpaceFactory>();
+        using var os = osFactory.CreateNonSecuredObjectSpace<OutboxJob>();
         
-        var backgroundJobClient = scope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
-        
-        var toProcess = await dbContext.Set<OutboxJob>()
+        var toProcess = await os.GetObjectsQuery<OutboxJob>()
             .Where(x => !x.Processed && x.Exception == null)
             .OrderBy(x => x.CreatedOn)
             .Take(_options.OutboxProcessorBatchSize)
@@ -39,7 +39,15 @@ public class OutboxProcessor: IOutboxProcessor
         {
             return;
         }
-        
+
+        var typesInfo = scope.ServiceProvider.GetRequiredService<ITypesInfo>();
+        var jobTypesInfo = typesInfo.FindTypeInfo(typeof(OutboxJob));
+        var processedMemberInfo = jobTypesInfo.FindMember(nameof(OutboxJob.Processed));
+        var jobIdMemberInfo = jobTypesInfo.FindMember(nameof(OutboxJob.HangfireJobId));
+        var exceptionMemberInfo = jobTypesInfo.FindMember(nameof(OutboxJob.Exception));
+
+        var backgroundJobClient = scope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
+
         _logger.LogDebug("Processing {nbJobs} outbox jobs", toProcess.Length);
         
         foreach (var outboxMessage in toProcess)
@@ -52,7 +60,7 @@ public class OutboxProcessor: IOutboxProcessor
             
             try
             {
-                _logger.LogDebug("Processing outbox job {id}", outboxMessage.Id);
+                _logger.LogDebug("Processing outbox job {id}", outboxMessage.Oid);
                 
                 var jobType = outboxMessage.GetJobType();
                 var job = new Job(jobType, outboxMessage.GetMethod(), outboxMessage.GetArguments().ToArray(), outboxMessage.Queue);
@@ -77,18 +85,21 @@ public class OutboxProcessor: IOutboxProcessor
 
                 outboxMessage.Processed = true;
                 outboxMessage.HangfireJobId = jobId;
-                
-                _logger.LogDebug("Successfully processed outbox job {id}", outboxMessage.Id);
+                os.SetModified(outboxMessage, processedMemberInfo);
+                os.SetModified(outboxMessage, jobIdMemberInfo);
+
+                _logger.LogDebug("Successfully processed outbox job {id}", outboxMessage.Oid);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Unable to process outbox job {id}", outboxMessage.Id);
+                _logger.LogError(e, "Unable to process outbox job {id}", outboxMessage.Oid);
                 outboxMessage.Exception = e.ToString();
+                os.SetModified(outboxMessage, exceptionMemberInfo);
             }
         }
 
         _logger.LogDebug("Persisting outbox job changes");
-        await dbContext.SaveChangesAsync(ct);
+        os.CommitChanges();
     }
 }
 

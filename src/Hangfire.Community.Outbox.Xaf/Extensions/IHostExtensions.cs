@@ -1,15 +1,15 @@
 ﻿namespace Hangfire.Community.Outbox.Xaf.Extensions;
 
 using BackgroundJobs;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 public static class IHostExtensions
 {
-    public static void UseHangfireOutbox(this IHost host)
+    public static void UseHangfireOutbox(this IApplicationBuilder appBuilder)
     {
-        var recurringJobManager = host.Services.GetRequiredService<IRecurringJobManager>();
-        var options = host.Services.GetRequiredService<HangfireOutboxOptions>();
+        var recurringJobManager = appBuilder.ApplicationServices.GetRequiredService<IRecurringJobManager>();
+        var options = appBuilder.ApplicationServices.GetRequiredService<HangfireOutboxOptions>();
         
         ConfigureCleanupJob(options, recurringJobManager);
 

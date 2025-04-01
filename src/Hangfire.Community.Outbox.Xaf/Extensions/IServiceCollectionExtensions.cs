@@ -1,7 +1,6 @@
 ﻿namespace Hangfire.Community.Outbox.Xaf.Extensions;
 
 using HostedServices;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Services;
 
@@ -12,8 +11,8 @@ public static class IServiceCollectionExtensions
     /// </summary>
     /// <param name="serviceCollection"></param>
     /// <param name="options"></param>
-    /// <typeparam name="TDbContext"></typeparam>
-    public static void AddHangfireOutbox<TDbContext>(this IServiceCollection serviceCollection, Action<HangfireOutboxOptions> options = null) where TDbContext : DbContext
+    /// <typeparam name="TUnitOfWork"></typeparam>
+    public static void AddHangfireOutbox(this IServiceCollection serviceCollection, Action<HangfireOutboxOptions> options = null)
     {
         //OPTIONS
         var outboxOptions = new HangfireOutboxOptions();
@@ -22,8 +21,6 @@ public static class IServiceCollectionExtensions
 
         //SERVICE REGISTRATIONS
         serviceCollection.AddSingleton(outboxOptions);
-        serviceCollection.AddScoped<IDbContextAccessor>(sp =>
-            new DbContextAccessor(sp.GetRequiredService<TDbContext>));
         serviceCollection.AddSingleton<IOutboxProcessor, OutboxProcessor>();
 
         if (outboxOptions.OutboxProcessor == HangfireOutboxOptions.OutboxProcessorType.HostedService)
