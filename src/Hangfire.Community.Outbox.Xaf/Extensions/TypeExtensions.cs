@@ -1,4 +1,4 @@
-﻿namespace Hangfire.Community.Outbox.Extensions;
+﻿namespace Hangfire.Community.Outbox.Xaf.Extensions;
 
 public static class TypeExtensions
 {

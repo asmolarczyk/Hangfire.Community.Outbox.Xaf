@@ -1,11 +1,11 @@
-﻿using Hangfire.Community.Outbox.Entities;
-using Hangfire.Community.Outbox.Services;
+﻿namespace Hangfire.Community.Outbox.Xaf.Extensions;
+
+using Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-namespace Hangfire.Community.Outbox.Extensions;
+using Services;
 
 public static class WebApplicationExtensions
 {

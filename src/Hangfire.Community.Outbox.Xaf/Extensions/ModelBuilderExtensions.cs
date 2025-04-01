@@ -1,7 +1,7 @@
-﻿using Hangfire.Community.Outbox.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿namespace Hangfire.Community.Outbox.Xaf.Extensions;
 
-namespace Hangfire.Community.Outbox.Extensions;
+using Entities;
+using Microsoft.EntityFrameworkCore;
 
 public static class ModelBuilderExtensions
 {

@@ -1,8 +1,8 @@
-﻿using Hangfire.Community.Outbox.Extensions;
-using Hangfire.Community.Outbox.Services;
-using Microsoft.Extensions.Hosting;
+﻿namespace Hangfire.Community.Outbox.Xaf.HostedServices;
 
-namespace Hangfire.Community.Outbox.HostedServices;
+using Extensions;
+using Microsoft.Extensions.Hosting;
+using Services;
 
 public class OutboxJobsProcessorBackgroundService: BackgroundService
 {

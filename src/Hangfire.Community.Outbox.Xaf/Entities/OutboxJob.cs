@@ -1,13 +1,13 @@
-﻿using System.Linq.Expressions;
+﻿namespace Hangfire.Community.Outbox.Xaf.Entities;
+
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using Extensions;
 using Hangfire.Common;
-using Hangfire.Community.Outbox.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace Hangfire.Community.Outbox.Entities;
 
 [EntityTypeConfiguration(typeof(OutboxJobEntityTypeConfiguration))]
 public class OutboxJob
