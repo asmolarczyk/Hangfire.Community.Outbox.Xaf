@@ -3,27 +3,25 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.1</FileVersion>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <FileVersion>1.1.0</FileVersion>
         <PackageId>Hangfire.Community.Outbox.Xaf</PackageId>
-        <Version>1.0.1</Version>
+        <Version>1.1.0</Version>
         <Authors>BredStik;asmolarczy</Authors>
 		<RepositoryUrl>https://github.com/BredStik/Hangfire.Outbox</RepositoryUrl>
-        <TargetFrameworks>net8.0</TargetFrameworks>
+        <TargetFrameworks>net9.0</TargetFrameworks>
         <PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<Description>Outbox pattern implementation for Hangfire using XAF/XPO</Description>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Hangfire.Core" Version="1.8.18" />
-	    <PackageReference Include="DevExpress.Xpo" Version="24.2.6" />
-        <PackageReference Include="DevExpress.ExpressApp" Version="24.2.6" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" Condition="'$(TargetFramework)' == 'net8.0'" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" Version="8.0.0" Condition="'$(TargetFramework)' == 'net8.0'" />
+        <PackageReference Include="Hangfire.Core" Version="1.8.20" />
+	    <PackageReference Include="DevExpress.Xpo" Version="24.2.7" />
+        <PackageReference Include="DevExpress.ExpressApp" Version="24.2.7" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" Version="9.0.6" />
     </ItemGroup>
     
     <ItemGroup>
