@@ -3,22 +3,23 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AssemblyVersion>1.1.0</AssemblyVersion>
-        <FileVersion>1.1.0</FileVersion>
+        <AssemblyVersion>1.2.0</AssemblyVersion>
+        <FileVersion>1.2.0</FileVersion>
         <PackageId>Hangfire.Community.Outbox.Xaf</PackageId>
-        <Version>1.1.0</Version>
+        <Version>1.2.0</Version>
         <Authors>BredStik;asmolarczy</Authors>
 		<RepositoryUrl>https://github.com/BredStik/Hangfire.Outbox</RepositoryUrl>
         <TargetFrameworks>net9.0</TargetFrameworks>
         <PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<Description>Outbox pattern implementation for Hangfire using XAF/XPO</Description>
+		<NoWarn>$(NoWarn);NU5104</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Hangfire.Core" Version="1.8.20" />
-	    <PackageReference Include="DevExpress.Xpo" Version="24.2.7" />
-        <PackageReference Include="DevExpress.ExpressApp" Version="24.2.7" />
+	    <PackageReference Include="DevExpress.Xpo" Version="25.1.2-beta" />
+        <PackageReference Include="DevExpress.ExpressApp" Version="25.1.2-beta" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <FrameworkReference Include="Microsoft.AspNetCore.App" Version="9.0.6" />
