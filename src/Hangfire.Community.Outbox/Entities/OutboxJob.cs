@@ -15,6 +15,11 @@ public class OutboxJob
     private OutboxJob()
     { }
 
+    private static string SerializeArgs(IReadOnlyList<object> args)
+    {
+        return JsonSerializer.Serialize(args.Select(a => a?.GetType() == typeof(CancellationToken) ? null : a));
+    }
+    
     private static OutboxJob Build(Job job, string queue)
     {
         return new OutboxJob()
@@ -22,7 +27,7 @@ public class OutboxJob
             JobType = job.Type.GetFriendlyName(),
             ArgumentTypesJson =
                 JsonSerializer.Serialize(job.Args.Select(a => a.GetType().GetFriendlyName())),
-            ArgumentValuesJson = JsonSerializer.Serialize(job.Args),
+            ArgumentValuesJson = SerializeArgs(job.Args),
             MethodName = job.Method.Name,
             CreatedOn = DateTime.UtcNow,
             Queue = queue
@@ -36,7 +41,7 @@ public class OutboxJob
             JobType = job.Type.GetFriendlyName(),
             ArgumentTypesJson =
                 JsonSerializer.Serialize(job.Args.Select(a => a.GetType().GetFriendlyName())),
-            ArgumentValuesJson = JsonSerializer.Serialize(job.Args),
+            ArgumentValuesJson = SerializeArgs(job.Args),
             MethodName = job.Method.Name,
             CreatedOn = DateTime.UtcNow,
             EnqueueAt = enqueueAt,
@@ -51,7 +56,7 @@ public class OutboxJob
             JobType = job.Type.GetFriendlyName(),
             ArgumentTypesJson =
                 JsonSerializer.Serialize(job.Args.Select(a => a.GetType().GetFriendlyName())),
-            ArgumentValuesJson = JsonSerializer.Serialize(job.Args),
+            ArgumentValuesJson = SerializeArgs(job.Args),
             MethodName = job.Method.Name,
             CreatedOn = DateTime.UtcNow,
             Delay = delay,
@@ -149,6 +154,12 @@ public class OutboxJob
         
         for (int i = 0; i < elements.Count(); i++)
         {
+            if (types[i] == typeof(CancellationToken))
+            {
+                yield return CancellationToken.None;
+                continue;
+            }
+            
             yield return elements.ElementAt(i).Deserialize(types[i]);
         }
     }
